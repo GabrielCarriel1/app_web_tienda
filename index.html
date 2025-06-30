@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda Familiar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .scanner-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+        }
+
+        .scan-btn:active {
+            transform: translateY(0);
+        }
+
+        .camera-container {
+            margin-top: 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+
+        #camera {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 100px;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .products-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #f8f9ff, #e6f2ff);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .product-info h3 {
+            color: #4a5568;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .product-code {
+            color: #718096;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .product-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .edit-btn {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #ef5350, #f44336);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .result-success {
+            border-left: 4px solid #48bb78;
+            background: linear-gradient(45deg, #f0fff4, #e6fffa);
+        }
+
+        .result-error {
+            border-left: 4px solid #f56565;
+            background: linear-gradient(45deg, #fff5f5, #fed7d7);
+        }
+
+        .add-product-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .add-product-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-save {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #f56565;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .offline-indicator.online {
+            background: #48bb78;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 Mi Tienda Familiar</h1>
+            <p>Consulta precios fácil y rápido</p>
+        </div>
+
+        <div class="scanner-section">
+            <button class="scan-btn" onclick="toggleCamera()">
+                📷 Escanear Código de Barras
+            </button>
+            <div class="camera-container" id="cameraContainer">
+                <video id="camera" autoplay></video>
+                <div class="camera-overlay"></div>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div id="resultContent"></div>
+        </div>
+
+        <div class="search-section">
+            <input type="text" class="search-input" placeholder="🔍 Buscar producto..." 
+                   oninput="searchProducts()" id="searchInput">
+        </div>
+
+        <div class="products-section">
+            <h3 style="margin-bottom: 15px; color: #4a5568;">📦 Productos</h3>
+            <div id="productsList"></div>
+            <button class="add-product-btn" onclick="showAddProductModal()">
+                ➕ Agregar Producto
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px; color: #4a5568;" id="modalTitle">Agregar Producto</h3>
+            <input type="text" class="modal-input" placeholder="Nombre del producto" id="productName">
+            <input type="text" class="modal-input" placeholder="Código de barras" id="productCode">
+            <input type="number" class="modal-input" placeholder="Precio" step="0.01" id="productPrice">
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" onclick="hideAddProductModal()">Cancelar</button>
+                <button class="modal-btn btn-save" onclick="saveProduct()" id="saveBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="offline-indicator" id="offlineIndicator">Sin conexión</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script>
+        // Base de datos de productos (se mantiene en memoria)
+        let products = [
+            { name: "Coca Cola 500ml", code: "7501055300006", price: 15.00 },
+            { name: "Pan Blanco", code: "7501000000001", price: 25.50 },
+            { name: "Leche Entera 1L", code: "7501000000002", price: 22.00 },
+            { name: "Arroz 1kg", code: "7501000000003", price: 18.75 },
+            { name: "Huevos 12 pzas", code: "7501000000004", price: 35.00 }
+        ];
+
+        let cameraActive = false;
+        let filteredProducts = [...products];
+        let editingProductIndex = -1;
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            displayProducts();
+            checkOnlineStatus();
+            
+            // Verificar estado de conexión cada 5 segundos
+            setInterval(checkOnlineStatus, 5000);
+        });
+
+        function displayProducts() {
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            filteredProducts.forEach((product, index) => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-code">${product.code}</div>
+                    </div>
+                    <div class="product-right">
+                        <div class="product-price">${product.price.toFixed(2)}</div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" onclick="editProduct(${index})">✏️ Editar</button>
+                            <button class="action-btn delete-btn" onclick="deleteProduct(${index})">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                productsList.appendChild(productItem);
+            });
+        }
+
+        function searchProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.code.includes(searchTerm)
+            );
+            displayProducts();
+        }
+
+        function toggleCamera() {
+            const cameraContainer = document.getElementById('cameraContainer');
+            const scanBtn = document.querySelector('.scan-btn');
+
+            if (!cameraActive) {
+                // Activar cámara
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                })
+                .then(stream => {
+                    const video = document.getElementById('camera');
+                    video.srcObject = stream;
+                    cameraContainer.style.display = 'block';
+                    scanBtn.textContent = '❌ Cerrar Cámara';
+                    cameraActive = true;
+                    
+                    // Inicializar QuaggaJS para escaneo
+                    initBarcodeScanner();
+                })
+                .catch(err => {
+                    showResult('❌ No se pudo acceder a la cámara. Verifica los permisos.', false);
+                });
+            } else {
+                // Desactivar cámara
+                const video = document.getElementById('camera');
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                cameraContainer.style.display = 'none';
+                scanBtn.textContent = '📷 Escanear Código de Barras';
+                cameraActive = false;
+                
+                // Detener QuaggaJS
+                if (typeof Quagga !== 'undefined') {
+                    Quagga.stop();
+                }
+            }
+        }
+
+        function initBarcodeScanner() {
+            if (typeof Quagga === 'undefined') {
+                showResult('⚠️ Escáner no disponible. Busca manualmente el producto.', false);
+                return;
+            }
+
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#camera'),
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader"]
+                }
+            }, function(err) {
+                if (err) {
+                    console.log(err);
+                    showResult('❌ Error al inicializar el escáner', false);
+                    return;
+                }
+                Quagga.start();
+            });
+
+            Quagga.onDetected(function(data) {
+                const code = data.codeResult.code;
+                searchProductByCode(code);
+                toggleCamera(); // Cerrar cámara después de escanear
+            });
+        }
+
+        function searchProductByCode(code) {
+            const product = products.find(p => p.code === code);
+            
+            if (product) {
+                showResult(`
+                    <h3 style="color: #48bb78; margin-bottom: 10px;">✅ Producto Encontrado</h3>
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${product.name}</div>
+                    <div style="color: #718096; margin-bottom: 10px;">Código: ${product.code}</div>
+                    <div style="font-size: 24px; color: #667eea; font-weight: bold;">$${product.price.toFixed(2)}</div>
+                `, true);
+            } else {
+                showResult(`
+                    <h3 style="color: #f56565; margin-bottom: 10px;">❌ Producto No Encontrado</h3>
+                    <div style="margin-bottom: 10px;">Código escaneado: ${code}</div>
+                    <div style="color: #718096;">Este producto no está en el catálogo</div>
+                `, false);
+            }
+        }
+
+        function showResult(content, isSuccess) {
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultContent.innerHTML = content;
+            resultSection.className = `result-section ${isSuccess ? 'result-success' : 'result-error'}`;
+            resultSection.style.display = 'block';
+            
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                resultSection.style.display = 'none';
+            }, 5000);
+        }
+
+        function showAddProductModal() {
+            editingProductIndex = -1;
+            document.getElementById('modalTitle').textContent = 'Agregar Producto';
+            document.getElementById('saveBtn').textContent = 'Guardar';
+            document.getElementById('productName').value = '';
+            document.getElementById('productCode').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('addProductModal').style.display = 'block';
+        }
+
+        function editProduct(index) {
+            const product = filteredProducts[index];
+            const originalIndex = products.findIndex(p => p.code === product.code);
+            
+            editingProductIndex = originalIndex;
+            document.getElementById('modalTitle').textContent = 'Editar Producto';
+            document.getElementById('saveBtn').textContent = 'Actualizar';
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productCode').value = product.code;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('addProductModal').style.display = 'block';
+        }
+
+        function deleteProduct(index) {
+            const product = filteredProducts[index];
+            
+            if (confirm(`¿Estás seguro de eliminar "${product.name}"?`)) {
+                const originalIndex = products.findIndex(p => p.code === product.code);
+                products.splice(originalIndex, 1);
+                filteredProducts = [...products];
+                displayProducts();
+                showResult(`✅ Producto "${product.name}" eliminado correctamente`, true);
+            }
+        }
+
+        function hideAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'none';
+            editingProductIndex = -1;
+        }
+
+        function saveProduct() {
+            const name = document.getElementById('productName').value.trim();
+            const code = document.getElementById('productCode').value.trim();
+            const price = parseFloat(document.getElementById('productPrice').value);
+
+            if (!name || !code || !price) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            if (editingProductIndex === -1) {
+                // Agregar nuevo producto
+                if (products.find(p => p.code === code)) {
+                    alert('Ya existe un producto con este código');
+                    return;
+                }
+                products.push({ name, code, price });
+                showResult(`✅ Producto "${name}" agregado correctamente`, true);
+            } else {
+                // Editar producto existente
+                const existingProduct = products.find(p => p.code === code);
+                if (existingProduct && products.indexOf(existingProduct) !== editingProductIndex) {
+                    alert('Ya existe un producto con este código');
+                    return;
+                }
+                products[editingProductIndex] = { name, code, price };
+                showResult(`✅ Producto "${name}" actualizado correctamente`, true);
+            }
+
+            filteredProducts = [...products];
+            displayProducts();
+            hideAddProductModal();
+        }
+
+        function checkOnlineStatus() {
+            const indicator = document.getElementById('offlineIndicator');
+            
+            if (navigator.onLine) {
+                indicator.textContent = '✅ En línea';
+                indicator.className = 'offline-indicator online';
+                indicator.style.display = 'block';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
+            } else {
+                indicator.textContent = '❌ Sin conexión';
+                indicator.className = 'offline-indicator';
+                indicator.style.display = 'block';
+            }
+        }
+
+        // Hacer que la app funcione offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Service worker básico para funcionamiento offline
+                const swCode = `
+                    self.addEventListener('fetch', function(event) {
+                        event.respondWith(
+                            caches.match(event.request).then(function(response) {
+                                return response || fetch(event.request);
+                            })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(function(registration) {
+                        console.log('ServiceWorker registrado');
+                    })
+                    .catch(function(error) {
+                        console.log('Error al registrar ServiceWorker');
+                    });
+            });
+        }
+
+        // Eventos para detectar cambios de conexión
+        window.addEventListener('online', checkOnlineStatus);
+        window.addEventListener('offline', checkOnlineStatus);
+    </script>
+</body>
+</html>
